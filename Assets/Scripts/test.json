@@ -1,0 +1,416 @@
+{
+    "redis_host": "127.0.0.1",
+    "redis_port": "6380",
+    "graph_name": "water_flow_test",
+    "graph_loaded_ts": 338255623677946,
+    "nodes": {
+        "water_flow": {
+            "name": "water_flow",
+            "nickname": "water_flow",
+            "module": "../brand-modules/brand-finger",
+            "redis_inputs": [
+                "target_data",
+                "finger_data"
+            ],
+            "redis_outputs": [
+                "game_session",
+                "game_state"
+            ],
+            "run_priority": 99,
+            "parameters": {
+                "log": "INFO",
+                "sync_key": "sync",
+                "time_key": "ts",
+                "log_state": true,
+                "width": 1395,
+                "height": 750,
+                "fullscreen": false,
+                "range": [
+                    -50,
+                    50
+                ],
+                "target_stream": "target_data",
+                "target_keys": [
+                    "thumb_fe",
+                    "index",
+                    "middle",
+                    "ring",
+                    "small"
+                ],
+                "user_stream": "finger_data",
+                "user_keys": [
+                    "thumb_fe",
+                    "index",
+                    "middle",
+                    "ring",
+                    "small"
+                ],
+                "inter_trial_time": 5.0,
+                "input_dtype": "float64",
+                "tolerance": 5,
+                "target_range": 100,
+                "state_stream": "state",
+                "state_key": "state",
+                "success_stream": "trial_success",
+                "success_key": "success"
+            },
+            "machine": "supervisor",
+            "binary": "/home/hailey/Projects/emory-cart/brand-modules/brand-finger/nodes/water_flow/water_flow.bin",
+            "git_hash": "533b6eb75820e9e12b520dd7d329662c89f8320f"
+        },
+        "block_timer": {
+            "name": "block_timer",
+            "nickname": "block_timer",
+            "module": "../brand-modules/brand-emory",
+            "run_priority": 99,
+            "cpu_affinity": 22,
+            "parameters": {
+                "log": "INFO",
+                "hours": 0,
+                "minutes": 3,
+                "seconds": 0
+            },
+            "machine": "supervisor",
+            "binary": "/home/hailey/Projects/emory-cart/brand-modules/brand-emory/nodes/block_timer/block_timer.bin",
+            "git_hash": ""
+        },
+        "finger_FSM": {
+            "name": "individuated_finger_FSM",
+            "nickname": "finger_FSM",
+            "module": "../brand-modules/brand-finger",
+            "redis_outputs": {
+                "state": "state",
+                "trial_success": "trial_success",
+                "target_data": "target_data",
+                "finger_data": "finger_data"
+            },
+            "run_priority": 99,
+            "cpu_affinity": 19,
+            "parameters": {
+                "log": "INFO",
+                "sync_key": "sync",
+                "time_key": "ts",
+                "debug_print_period": 0.25,
+                "vel_or_pos": "vel",
+                "target_groups": [
+                    [
+                        "index"
+                    ],
+                    [
+                        "middle",
+                        "ring",
+                        "small"
+                    ]
+                ],
+                "finger_groups": [
+                    [
+                        "thumb_fe"
+                    ],
+                    [
+                        "thumb_a"
+                    ],
+                    [
+                        "index"
+                    ],
+                    [
+                        "middle"
+                    ],
+                    [
+                        "ring"
+                    ],
+                    [
+                        "small"
+                    ]
+                ],
+                "tolerance": 5,
+                "co_target_options": [
+                    -30,
+                    30
+                ],
+                "delay_time": 0.0,
+                "target_hold_time": 1.0,
+                "timeout": 10.0,
+                "inter_trial_time": 5.0,
+                "target_style": "center_out",
+                "stream_name": "indiv_fingers",
+                "vector_key": "samples",
+                "finger_dtype": "float64",
+                "force_cycle": true
+            },
+            "machine": "supervisor",
+            "binary": "/home/hailey/Projects/emory-cart/brand-modules/brand-finger/nodes/individuated_finger_FSM/individuated_finger_FSM.bin",
+            "git_hash": "533b6eb75820e9e12b520dd7d329662c89f8320f"
+        },
+        "auto_cue": {
+            "name": "auto_cue",
+            "nickname": "auto_cue",
+            "module": "../brand-modules/brand-emory",
+            "run_priority": 99,
+            "cpu_affinity": 18,
+            "redis_outputs": {
+                "indiv_fingers": "control_vec"
+            },
+            "parameters": {
+                "input_stream": "xpc_gen",
+                "input_rate": 100,
+                "output_stream": "indiv_fingers",
+                "output_vect_name": "samples",
+                "target_stream": "target_data",
+                "target_list": [
+                    "thumb_fe",
+                    "thumb_a",
+                    "index",
+                    "middle",
+                    "ring",
+                    "small"
+                ],
+                "target_dtype": "float64",
+                "target_on_off": "visible",
+                "target_off_center": true,
+                "move_stream": "finger_data",
+                "move_list": [
+                    "thumb_fe",
+                    "thumb_a",
+                    "index",
+                    "middle",
+                    "ring",
+                    "small"
+                ],
+                "move_list_len": 6,
+                "move_dtype": "float64",
+                "speed": 1,
+                "vel_profile": "gaussian",
+                "vel_output": true,
+                "error_thres": 0.01,
+                "min_speed": 0.0005,
+                "pd_kp": 0.0005,
+                "pd_kd": 0.0005,
+                "standard_nd": true,
+                "log": "INFO",
+                "sync_key": "sync",
+                "time_key": "ts"
+            },
+            "machine": "supervisor",
+            "binary": "/home/hailey/Projects/emory-cart/brand-modules/brand-emory/nodes/auto_cue/auto_cue.bin",
+            "git_hash": "1d0c028ceda6a675bcfb74975085af0aeb463dd2"
+        },
+        "xpc_gen": {
+            "name": "xpc_gen",
+            "nickname": "xpc_gen",
+            "module": "../brand-modules/brand-games",
+            "redis_inputs": [],
+            "redis_outputs": [
+                "xpc_gen"
+            ],
+            "run_priority": 99,
+            "parameters": {
+                "sample_rate": 1000,
+                "random_seed": 0,
+                "max_samples": 1000,
+                "output_stream": "xpc_gen",
+                "n_neurons": 256,
+                "udp_ip": "192.168.1.101",
+                "udp_port": 1002,
+                "udp_interface": "",
+                "log": "INFO"
+            },
+            "machine": "supervisor",
+            "binary": "/home/hailey/Projects/emory-cart/brand-modules/brand-games/nodes/xpc_gen/xpc_gen.bin",
+            "git_hash": "a822678592638d6e2d3b0ff6df6ef934b774f16a"
+        }
+    },
+    "derivatives": {},
+    "rdb_dirpath": "/home/hailey/Projects/emory-cart/Data/t16/2024-06-11/RawData/RDB",
+    "rdb_filename": "t16_240611T1453_water_flow_test.rdb",
+    "streams": {
+        "state": {
+            "enable_nwb": true,
+            "type_nwb": "Trial",
+            "state": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "str",
+                "nwb": {
+                    "trial_state": "state",
+                    "start_trial_indicators": [
+                        "start_trial"
+                    ],
+                    "end_trial_indicators": [
+                        "end_trial"
+                    ],
+                    "other_trial_indicators": [
+                        "movement",
+                        "delay"
+                    ],
+                    "movement_description": "The time at which movement begins",
+                    "delay_description": "The time at which the delay period begins"
+                }
+            },
+            "source_nickname": "finger_FSM"
+        },
+        "trial_success": {
+            "enable_nwb": true,
+            "type_nwb": "TrialInfo",
+            "success": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "bool",
+                "nwb": {
+                    "description": "A boolean indicator of whether the trial's target was acquired successfully"
+                }
+            },
+            "source_nickname": "finger_FSM"
+        },
+        "target_data": {
+            "enable_nwb": true,
+            "type_nwb": "TrialInfo",
+            "thumb_fe": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "description": "direction of the thumb flexion/extension target, in degrees"
+                }
+            },
+            "thumb_a": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "description": "direction of the thumb abduction/adduction target, in degrees"
+                }
+            },
+            "index": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "description": "direction of the index target, in degrees"
+                }
+            },
+            "middle": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "description": "direction of the middle target, in degrees"
+                }
+            },
+            "ring": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "description": "direction of the ring target, in degrees"
+                }
+            },
+            "small": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "description": "direction of the small target, in degrees"
+                }
+            },
+            "visible": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "description": "whether the target was visible (1) or not (0)"
+                }
+            },
+            "hold_time": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "description": "how long the target must be held for success, in seconds"
+                }
+            },
+            "tolerance": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "int",
+                "nwb": {
+                    "description": "how close to the target to be considered inside, in arbitrary units"
+                }
+            },
+            "source_nickname": "finger_FSM"
+        },
+        "finger_data": {
+            "enable_nwb": true,
+            "type_nwb": "TimeSeries",
+            "thumb_fe": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "unit": "degrees",
+                    "description": "direction of the thumb flexion/extension angle"
+                }
+            },
+            "thumb_a": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "unit": "degrees",
+                    "description": "direction of the thumb abduction/adduction angle"
+                }
+            },
+            "index": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "unit": "degrees",
+                    "description": "direction of the index point"
+                }
+            },
+            "middle": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "unit": "degrees",
+                    "description": "direction of the middle point"
+                }
+            },
+            "ring": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "unit": "degrees",
+                    "description": "direction of the ring point"
+                }
+            },
+            "small": {
+                "chan_per_stream": 1,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "unit": "degrees",
+                    "description": "direction of the small point"
+                }
+            },
+            "source_nickname": "finger_FSM"
+        },
+        "indiv_fingers": {
+            "enable_nwb": true,
+            "type_nwb": "TimeSeries",
+            "samples": {
+                "chan_per_stream": 6,
+                "samp_per_stream": 1,
+                "sample_type": "float64",
+                "nwb": {
+                    "unit": "arbitrary units",
+                    "description": "control output"
+                }
+            },
+            "source_nickname": "auto_cue"
+        }
+    },
+    "brand_hash": "341abc0bc6ad1b7d28a2be007df7dda68febeddc"
+}
